@@ -17,6 +17,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -1164,6 +1165,9 @@ const TasksPage: React.FC = () => {
             <DialogTitle>
               {dialogMode === 'add' ? 'Neue Aufgabe hinzufügen' : 'Aufgabe bearbeiten'}
             </DialogTitle>
+            <DialogDescription>
+              {dialogMode === 'add' ? 'Erstellen Sie eine neue Aufgabe für das Projekt' : 'Aufgabendetails bearbeiten'}
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div className="space-y-2">
@@ -1221,6 +1225,7 @@ const TasksPage: React.FC = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Subtasks - {subtasksTaskName}</DialogTitle>
+            <DialogDescription>Teilaufgaben verwalten</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="flex gap-2">
@@ -1270,12 +1275,13 @@ const TasksPage: React.FC = () => {
 
       {/* Time Entries Dialog */}
       <Dialog open={timeEntriesDialogOpen} onOpenChange={setTimeEntriesDialogOpen}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Zeiterfassung - {timeEntriesTaskName}</DialogTitle>
+            <DialogDescription>Zeiteinträge für diese Aufgabe verwalten</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+            <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label>Startzeit</Label>
@@ -1302,7 +1308,7 @@ const TasksPage: React.FC = () => {
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-4 gap-3">
                 <div className="space-y-1.5">
                   <Label>Stunden *</Label>
                   <Input
@@ -1313,7 +1319,7 @@ const TasksPage: React.FC = () => {
                     onChange={(e) => setTimeEntryForm({ ...timeEntryForm, hours: e.target.value })}
                   />
                 </div>
-                <div className="col-span-2 space-y-1.5">
+                <div className="col-span-3 space-y-1.5">
                   <Label>Notizen</Label>
                   <Input
                     placeholder="Woran wurde gearbeitet?"
@@ -1326,6 +1332,7 @@ const TasksPage: React.FC = () => {
                 <Plus className="size-4" /> Zeiteintrag hinzufügen
               </Button>
             </div>
+            <Separator />
             {timeEntriesLoading ? (
               <div className="flex justify-center p-4">
                 <Loader2 className="size-5 animate-spin" />
@@ -1376,6 +1383,7 @@ const TasksPage: React.FC = () => {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Kommentare - {commentsTaskName}</DialogTitle>
+            <DialogDescription>Kommentare zu dieser Aufgabe</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             {commentsLoading ? (
@@ -1439,8 +1447,9 @@ const TasksPage: React.FC = () => {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Zeiteintrag bearbeiten</DialogTitle>
+            <DialogDescription>Start- und Endzeit, Stunden und Notizen anpassen</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 pt-2">
+          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>Startzeit</Label>
@@ -1467,7 +1476,7 @@ const TasksPage: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-4 gap-3">
               <div className="space-y-1.5">
                 <Label>Stunden *</Label>
                 <Input
@@ -1478,7 +1487,7 @@ const TasksPage: React.FC = () => {
                   onChange={(e) => setEditTimeEntryData({ ...editTimeEntryData, hours: e.target.value })}
                 />
               </div>
-              <div className="col-span-2 space-y-1.5">
+              <div className="col-span-3 space-y-1.5">
                 <Label>Notizen</Label>
                 <Input
                   placeholder="Woran wurde gearbeitet?"
@@ -1504,6 +1513,7 @@ const TasksPage: React.FC = () => {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Kommentar bearbeiten</DialogTitle>
+            <DialogDescription>Kommentartext anpassen</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div className="space-y-1.5">
@@ -1532,6 +1542,7 @@ const TasksPage: React.FC = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Zeiteintrag speichern</DialogTitle>
+            <DialogDescription>Timer-Ergebnis als Zeiteintrag speichern</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             {stopTimerData && (
