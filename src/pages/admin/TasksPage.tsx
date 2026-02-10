@@ -392,6 +392,15 @@ const TasksPage: React.FC = () => {
   };
 
   // =================== TIME ENTRIES ===================
+  const calculateHoursFromTimes = (start: string, end: string): string => {
+    if (!start || !end) return '';
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const diffMs = endDate.getTime() - startDate.getTime();
+    if (diffMs <= 0) return '';
+    return (diffMs / (1000 * 60 * 60)).toFixed(2);
+  };
+
   const handleManageTimeEntries = async (taskId: string, taskName: string) => {
     setTimeEntriesTaskId(taskId);
     setTimeEntriesTaskName(taskName);
@@ -1273,7 +1282,11 @@ const TasksPage: React.FC = () => {
                   <Input
                     type="datetime-local"
                     value={timeEntryForm.start_time}
-                    onChange={(e) => setTimeEntryForm({ ...timeEntryForm, start_time: e.target.value })}
+                    onChange={(e) => {
+                      const newStart = e.target.value;
+                      const hours = calculateHoursFromTimes(newStart, timeEntryForm.end_time);
+                      setTimeEntryForm({ ...timeEntryForm, start_time: newStart, ...(hours ? { hours } : {}) });
+                    }}
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -1281,7 +1294,11 @@ const TasksPage: React.FC = () => {
                   <Input
                     type="datetime-local"
                     value={timeEntryForm.end_time}
-                    onChange={(e) => setTimeEntryForm({ ...timeEntryForm, end_time: e.target.value })}
+                    onChange={(e) => {
+                      const newEnd = e.target.value;
+                      const hours = calculateHoursFromTimes(timeEntryForm.start_time, newEnd);
+                      setTimeEntryForm({ ...timeEntryForm, end_time: newEnd, ...(hours ? { hours } : {}) });
+                    }}
                   />
                 </div>
               </div>
@@ -1290,8 +1307,8 @@ const TasksPage: React.FC = () => {
                   <Label>Stunden *</Label>
                   <Input
                     type="number"
-                    step="0.5"
-                    placeholder="z.B. 2.5"
+                    step="0.01"
+                    placeholder="z.B. 2.50"
                     value={timeEntryForm.hours}
                     onChange={(e) => setTimeEntryForm({ ...timeEntryForm, hours: e.target.value })}
                   />
@@ -1430,7 +1447,11 @@ const TasksPage: React.FC = () => {
                 <Input
                   type="datetime-local"
                   value={editTimeEntryData.start_time}
-                  onChange={(e) => setEditTimeEntryData({ ...editTimeEntryData, start_time: e.target.value })}
+                  onChange={(e) => {
+                    const newStart = e.target.value;
+                    const hours = calculateHoursFromTimes(newStart, editTimeEntryData.end_time);
+                    setEditTimeEntryData({ ...editTimeEntryData, start_time: newStart, ...(hours ? { hours } : {}) });
+                  }}
                 />
               </div>
               <div className="space-y-1.5">
@@ -1438,7 +1459,11 @@ const TasksPage: React.FC = () => {
                 <Input
                   type="datetime-local"
                   value={editTimeEntryData.end_time}
-                  onChange={(e) => setEditTimeEntryData({ ...editTimeEntryData, end_time: e.target.value })}
+                  onChange={(e) => {
+                    const newEnd = e.target.value;
+                    const hours = calculateHoursFromTimes(editTimeEntryData.start_time, newEnd);
+                    setEditTimeEntryData({ ...editTimeEntryData, end_time: newEnd, ...(hours ? { hours } : {}) });
+                  }}
                 />
               </div>
             </div>
@@ -1447,8 +1472,8 @@ const TasksPage: React.FC = () => {
                 <Label>Stunden *</Label>
                 <Input
                   type="number"
-                  step="0.5"
-                  placeholder="z.B. 2.5"
+                  step="0.01"
+                  placeholder="z.B. 2.50"
                   value={editTimeEntryData.hours}
                   onChange={(e) => setEditTimeEntryData({ ...editTimeEntryData, hours: e.target.value })}
                 />
