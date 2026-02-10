@@ -114,38 +114,37 @@ export function useTimer() {
     });
   }, []);
 
-  const stopTimer = useCallback(() => {
-    let result: {
-      taskId: string;
-      taskName: string;
-      startedAt: string;
-      endedAt: string;
-      hours: number;
-    } | null = null;
+  const stopTimer = useCallback((): {
+    taskId: string;
+    taskName: string;
+    startedAt: string;
+    endedAt: string;
+    hours: number;
+  } | null => {
+    const prev = timerState;
+    if (prev.status === 'idle' || !prev.taskId || !prev.startedAt) {
+      return null;
+    }
 
-    setTimerState((prev) => {
-      if (prev.status === 'idle' || !prev.taskId || !prev.startedAt) return IDLE_STATE;
+    let finalSeconds = prev.elapsedSeconds;
+    if (prev.status === 'running' && prev.lastResumedAt) {
+      finalSeconds += Math.floor(
+        (Date.now() - new Date(prev.lastResumedAt).getTime()) / 1000
+      );
+    }
 
-      let finalSeconds = prev.elapsedSeconds;
-      if (prev.status === 'running' && prev.lastResumedAt) {
-        finalSeconds += Math.floor(
-          (Date.now() - new Date(prev.lastResumedAt).getTime()) / 1000
-        );
-      }
+    const result = {
+      taskId: prev.taskId,
+      taskName: prev.taskName || '',
+      startedAt: prev.startedAt,
+      endedAt: new Date().toISOString(),
+      hours: parseFloat((Math.max(0, finalSeconds) / 3600).toFixed(2)),
+    };
 
-      result = {
-        taskId: prev.taskId,
-        taskName: prev.taskName || '',
-        startedAt: prev.startedAt,
-        endedAt: new Date().toISOString(),
-        hours: parseFloat((Math.max(0, finalSeconds) / 3600).toFixed(2)),
-      };
-
-      return IDLE_STATE;
-    });
+    setTimerState(IDLE_STATE);
 
     return result;
-  }, []);
+  }, [timerState]);
 
   const discardTimer = useCallback(() => {
     setTimerState(IDLE_STATE);
