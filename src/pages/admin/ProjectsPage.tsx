@@ -305,7 +305,7 @@ const ProjectsPage: React.FC = () => {
                     <TableCell>
                       {getStatusBadge(project.status)}
                     </TableCell>
-                    <TableCell>{project.total_hours.toFixed(1)}</TableCell>
+                    <TableCell>{project.total_hours.toFixed(2)}</TableCell>
                     <TableCell>{'\u20AC'}{project.total_cost.toFixed(2)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">

@@ -186,7 +186,7 @@ const CustomerDashboardPage: React.FC = () => {
               </AvatarFallback>
             </Avatar>
             <div>
-              <span className="text-2xl font-semibold">{totalHours.toFixed(1)}</span>
+              <span className="text-2xl font-semibold">{totalHours.toFixed(2)}</span>
               <p className="text-sm text-muted-foreground">Gesamtstunden</p>
             </div>
           </CardContent>

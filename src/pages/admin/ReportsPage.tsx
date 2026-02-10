@@ -267,7 +267,7 @@ const ReportsPage: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-1">
                   <p className="text-sm">
-                    <strong>Gesamtstunden:</strong> {reportData.total_hours.toFixed(1)}
+                    <strong>Gesamtstunden:</strong> {reportData.total_hours.toFixed(2)}
                   </p>
                   <p className="text-sm">
                     <strong>Gesamtkosten:</strong> &euro;{reportData.total_cost.toFixed(2)}
@@ -317,7 +317,7 @@ const ReportsPage: React.FC = () => {
                       <TableRow key={project.id}>
                         <TableCell>{project.name}</TableCell>
                         <TableCell>{project.customer?.company_name}</TableCell>
-                        <TableCell>{project.total_hours?.toFixed(1) || '0.0'}</TableCell>
+                        <TableCell>{project.total_hours?.toFixed(2) || '0.00'}</TableCell>
                         <TableCell>&euro;{project.total_cost?.toFixed(2) || '0.00'}</TableCell>
                         <TableCell>
                           {invoiceInfo ? `${invoiceInfo.invoiced}/${invoiceInfo.total} berechnet` : '0/0 berechnet'}

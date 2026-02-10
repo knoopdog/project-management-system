@@ -907,7 +907,7 @@ const TasksPage: React.FC = () => {
                       <TableRow key={task.id}>
                         <TableCell>{task.name}</TableCell>
                         <TableCell>{task.description}</TableCell>
-                        <TableCell>{task.total_hours.toFixed(1)}</TableCell>
+                        <TableCell>{task.total_hours.toFixed(2)}</TableCell>
                         <TableCell>&euro;{task.total_cost.toFixed(2)}</TableCell>
                         <TableCell>
                           <Badge
@@ -1039,7 +1039,7 @@ const TasksPage: React.FC = () => {
                         <TableCell className="text-sm whitespace-nowrap">
                           {format(new Date(entry.start_time), 'dd.MM.yyyy HH:mm')}
                         </TableCell>
-                        <TableCell className="font-medium">{entry.hours.toFixed(1)}h</TableCell>
+                        <TableCell className="font-medium">{entry.hours.toFixed(2)}h</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{entry.notes}</TableCell>
                         <TableCell>
                           <Badge variant={entry.manual_entry ? 'outline' : 'secondary'} className="text-xs">
@@ -1330,7 +1330,7 @@ const TasksPage: React.FC = () => {
                         <TableCell className="text-sm whitespace-nowrap">
                           {format(new Date(entry.start_time), 'dd.MM.yyyy HH:mm')}
                         </TableCell>
-                        <TableCell className="font-medium">{entry.hours.toFixed(1)}h</TableCell>
+                        <TableCell className="font-medium">{entry.hours.toFixed(2)}h</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{entry.notes}</TableCell>
                         <TableCell>
                           <Button

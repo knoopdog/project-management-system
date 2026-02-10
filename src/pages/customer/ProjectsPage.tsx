@@ -217,7 +217,7 @@ const ProjectsPage: React.FC = () => {
                         <span className="font-semibold">Aufgaben:</span> {taskCount}
                       </p>
                       <p className="text-sm">
-                        <span className="font-semibold">Stunden:</span> {totalHours.toFixed(1)}
+                        <span className="font-semibold">Stunden:</span> {totalHours.toFixed(2)}
                       </p>
                       <p className="text-sm">
                         <span className="font-semibold">Kosten:</span> &euro;{totalCost.toFixed(2)}

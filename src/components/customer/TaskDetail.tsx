@@ -203,7 +203,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({ taskId }) => {
             <Card>
               <CardContent className="pt-0">
                 <p className="text-sm text-muted-foreground">Gesamtstunden</p>
-                <h3 className="text-lg font-semibold">{task.total_hours.toFixed(1)}</h3>
+                <h3 className="text-lg font-semibold">{task.total_hours.toFixed(2)}</h3>
               </CardContent>
             </Card>
             <Card>
@@ -267,7 +267,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({ taskId }) => {
               {timeEntries.map((entry) => (
                 <div key={entry.id} className="border-b py-3 last:border-b-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold">{entry.hours.toFixed(1)} Stunden</span>
+                    <span className="font-bold">{entry.hours.toFixed(2)} Stunden</span>
                     <span className="text-sm text-muted-foreground ml-2">
                       &euro;{entry.cost.toFixed(2)}
                     </span>

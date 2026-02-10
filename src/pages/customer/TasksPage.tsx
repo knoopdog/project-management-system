@@ -208,7 +208,7 @@ const TasksPage: React.FC = () => {
                         {getStatusLabel(task.project?.status as ProjectStatus)}
                       </Badge>
                     </TableCell>
-                    <TableCell>{task.total_hours.toFixed(1)}</TableCell>
+                    <TableCell>{task.total_hours.toFixed(2)}</TableCell>
                     <TableCell>{'\u20AC'}{task.total_cost.toFixed(2)}</TableCell>
                     <TableCell className="text-right">
                       <Button
