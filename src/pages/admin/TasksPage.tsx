@@ -670,6 +670,7 @@ const TasksPage: React.FC = () => {
       if (updateError) throw updateError;
       setEditTimeEntryDialogOpen(false);
       fetchRecentProjectTimeEntries();
+      if (timeEntriesTaskId) fetchTimeEntries(timeEntriesTaskId);
       if (selectedProjectId) fetchTasks(selectedProjectId);
     } catch (err: any) {
       console.error('Error updating time entry:', err);
@@ -1345,7 +1346,7 @@ const TasksPage: React.FC = () => {
                       <TableHead>Datum</TableHead>
                       <TableHead className="w-20">Stunden</TableHead>
                       <TableHead>Notizen</TableHead>
-                      <TableHead className="w-10"></TableHead>
+                      <TableHead className="w-20 text-right">Aktionen</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -1356,15 +1357,27 @@ const TasksPage: React.FC = () => {
                         </TableCell>
                         <TableCell className="font-medium">{entry.hours.toFixed(2)}h</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{entry.notes}</TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-7 text-destructive hover:text-destructive"
-                            onClick={() => handleDeleteTimeEntry(entry.id)}
-                          >
-                            <Trash2 className="size-3" />
-                          </Button>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-7"
+                              onClick={() => handleEditTimeEntry(entry)}
+                              title="Bearbeiten"
+                            >
+                              <Pencil className="size-3" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-7 text-destructive hover:text-destructive"
+                              onClick={() => handleDeleteTimeEntry(entry.id)}
+                              title="Löschen"
+                            >
+                              <Trash2 className="size-3" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
