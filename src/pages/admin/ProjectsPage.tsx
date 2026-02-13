@@ -41,6 +41,7 @@ const ProjectsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('all');
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -217,7 +218,13 @@ const ProjectsPage: React.FC = () => {
     }
   };
 
-  const filteredProjects = projects.filter((project) => {
+  // Stage 1: Filter by customer
+  const customerFilteredProjects = selectedCustomerId === 'all'
+    ? projects
+    : projects.filter((project) => project.customer_id === selectedCustomerId);
+
+  // Stage 2: Filter by text search
+  const filteredProjects = customerFilteredProjects.filter((project) => {
     const searchLower = searchQuery.toLowerCase();
     return (
       project.name.toLowerCase().includes(searchLower) ||
@@ -225,6 +232,22 @@ const ProjectsPage: React.FC = () => {
       project.customer?.company_name.toLowerCase().includes(searchLower)
     );
   });
+
+  // Stage 3: Group by customer
+  const groupedProjects = filteredProjects.reduce<
+    { customerId: string; customerName: string; projects: Project[] }[]
+  >((groups, project) => {
+    const customerId = project.customer_id;
+    const customerName = project.customer?.company_name || 'Unbekannter Kunde';
+    let group = groups.find((g) => g.customerId === customerId);
+    if (!group) {
+      group = { customerId, customerName, projects: [] };
+      groups.push(group);
+    }
+    group.projects.push(project);
+    return groups;
+  }, []);
+  groupedProjects.sort((a, b) => a.customerName.localeCompare(b.customerName));
 
   if (loading) {
     return (
@@ -246,8 +269,23 @@ const ProjectsPage: React.FC = () => {
 
       <Card>
         <CardContent>
-          <div className="flex items-center justify-between mb-4">
-            <div className="relative w-[70%]">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-[220px]">
+              <Select value={selectedCustomerId} onValueChange={setSelectedCustomerId}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Kunde filtern" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle Kunden</SelectItem>
+                  {customers.map((customer) => (
+                    <SelectItem key={customer.id} value={customer.id}>
+                      {customer.company_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
               <Input
                 placeholder="Projekte suchen..."
@@ -285,65 +323,78 @@ const ProjectsPage: React.FC = () => {
 
           <Separator className="mb-4" />
 
-          {filteredProjects.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Projektname</TableHead>
-                  <TableHead>Kunde</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Stunden</TableHead>
-                  <TableHead>Kosten</TableHead>
-                  <TableHead className="text-right">Aktionen</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredProjects.map((project) => (
-                  <TableRow key={project.id}>
-                    <TableCell>{project.name}</TableCell>
-                    <TableCell>{project.customer?.company_name}</TableCell>
-                    <TableCell>
-                      {getStatusBadge(project.status)}
-                    </TableCell>
-                    <TableCell>{project.total_hours.toFixed(2)}</TableCell>
-                    <TableCell>{'\u20AC'}{project.total_cost.toFixed(2)}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleViewTasks(project.id)}
-                          title="Aufgaben anzeigen"
-                        >
-                          <ClipboardList className="size-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleOpenDialog('edit', project)}
-                          title="Projekt bearbeiten"
-                        >
-                          <Pencil className="size-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDeleteProject(project.id)}
-                          title="Projekt löschen"
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          {groupedProjects.length > 0 ? (
+            <div className="space-y-6">
+              {groupedProjects.map((group, groupIndex) => (
+                <div key={group.customerId}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <h3 className="text-lg font-semibold">{group.customerName}</h3>
+                    <Badge variant="secondary">
+                      {group.projects.length} {group.projects.length === 1 ? 'Projekt' : 'Projekte'}
+                    </Badge>
+                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Projektname</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Stunden</TableHead>
+                        <TableHead>Kosten</TableHead>
+                        <TableHead className="text-right">Aktionen</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {group.projects.map((project) => (
+                        <TableRow key={project.id}>
+                          <TableCell>{project.name}</TableCell>
+                          <TableCell>
+                            {getStatusBadge(project.status)}
+                          </TableCell>
+                          <TableCell>{project.total_hours.toFixed(2)}</TableCell>
+                          <TableCell>{'\u20AC'}{project.total_cost.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleViewTasks(project.id)}
+                                title="Aufgaben anzeigen"
+                              >
+                                <ClipboardList className="size-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleOpenDialog('edit', project)}
+                                title="Projekt bearbeiten"
+                              >
+                                <Pencil className="size-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteProject(project.id)}
+                                title="Projekt löschen"
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="size-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  {groupIndex < groupedProjects.length - 1 && (
+                    <Separator className="mt-4" />
+                  )}
+                </div>
+              ))}
+            </div>
           ) : (
             <p className="text-center py-8 text-muted-foreground">
-              {searchQuery
-                ? 'Keine Projekte gefunden, die Ihren Suchkriterien entsprechen.'
+              {searchQuery || selectedCustomerId !== 'all'
+                ? 'Keine Projekte gefunden, die Ihren Filterkriterien entsprechen.'
                 : 'Keine Projekte vorhanden. Erstellen Sie Ihr erstes Projekt über den Button oben.'}
             </p>
           )}

@@ -61,6 +61,8 @@ const TasksPage: React.FC = () => {
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [customers, setCustomers] = useState<{ id: string; company_name: string }[]>([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -142,17 +144,35 @@ const TasksPage: React.FC = () => {
 
   useEffect(() => {
     fetchProjects();
+    fetchCustomers();
   }, []);
 
+  // Auto-select customer when arriving via URL parameter
   useEffect(() => {
-    if (projects.length > 0) {
-      if (projectIdFromUrl && projects.some(p => p.id === projectIdFromUrl)) {
-        setSelectedProjectId(projectIdFromUrl);
-      } else if (!selectedProjectId) {
-        setSelectedProjectId(projects[0].id);
+    if (projectIdFromUrl && projects.length > 0) {
+      const target = projects.find(p => p.id === projectIdFromUrl);
+      if (target && target.customer_id) {
+        setSelectedCustomerId(target.customer_id);
       }
     }
-  }, [projects, projectIdFromUrl]);
+  }, [projectIdFromUrl, projects]);
+
+  // Filter projects by selected customer
+  const filteredProjectsByCustomer = selectedCustomerId === 'all'
+    ? projects
+    : projects.filter(p => p.customer_id === selectedCustomerId);
+
+  useEffect(() => {
+    if (filteredProjectsByCustomer.length > 0) {
+      if (projectIdFromUrl && filteredProjectsByCustomer.some(p => p.id === projectIdFromUrl)) {
+        setSelectedProjectId(projectIdFromUrl);
+      } else if (!selectedProjectId || !filteredProjectsByCustomer.some(p => p.id === selectedProjectId)) {
+        setSelectedProjectId(filteredProjectsByCustomer[0].id);
+      }
+    } else {
+      setSelectedProjectId(null);
+    }
+  }, [filteredProjectsByCustomer.length, projects, projectIdFromUrl, selectedCustomerId]);
 
   useEffect(() => {
     if (selectedProjectId) {
@@ -167,6 +187,7 @@ const TasksPage: React.FC = () => {
         .select(`
           id,
           name,
+          customer_id,
           customer:customers(id, company_name)
         `)
         .order('name', { ascending: true });
@@ -183,7 +204,7 @@ const TasksPage: React.FC = () => {
         return {
           id: p.id,
           name: p.name,
-          customer_id: p.id,
+          customer_id: p.customer_id,
           description: '',
           status: 'not_started' as ProjectStatus,
           total_hours: 0,
@@ -200,6 +221,20 @@ const TasksPage: React.FC = () => {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCustomers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('customers')
+        .select('id, company_name')
+        .order('company_name', { ascending: true });
+
+      if (error) throw error;
+      setCustomers(data || []);
+    } catch (err: any) {
+      console.error('Error fetching customers:', err);
     }
   };
 
@@ -802,22 +837,39 @@ const TasksPage: React.FC = () => {
       <Card>
         <CardContent>
           <div className="flex items-center justify-between mb-4">
-            <div className="w-[250px]">
-              <Select
-                value={selectedProjectId || ''}
-                onValueChange={handleProjectChange}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Projekt auswählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {projects.map((project) => (
-                    <SelectItem key={project.id} value={project.id}>
-                      {project.name} ({project.customer?.company_name})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="flex items-center gap-3">
+              <div className="w-[200px]">
+                <Select value={selectedCustomerId} onValueChange={setSelectedCustomerId}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Kunde filtern" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle Kunden</SelectItem>
+                    {customers.map((customer) => (
+                      <SelectItem key={customer.id} value={customer.id}>
+                        {customer.company_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-[250px]">
+                <Select
+                  value={selectedProjectId || ''}
+                  onValueChange={handleProjectChange}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Projekt auswählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredProjectsByCustomer.map((project) => (
+                      <SelectItem key={project.id} value={project.id}>
+                        {project.name} ({project.customer?.company_name})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <Button
               onClick={() => handleOpenDialog('add')}
