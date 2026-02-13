@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Pencil, Trash2, Search, X, ClipboardList, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, X, ClipboardList, Loader2, Building2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Table,
@@ -23,6 +23,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import {
   Select,
   SelectContent,
@@ -324,73 +330,78 @@ const ProjectsPage: React.FC = () => {
           <Separator className="mb-4" />
 
           {groupedProjects.length > 0 ? (
-            <div className="space-y-6">
-              {groupedProjects.map((group, groupIndex) => (
-                <div key={group.customerId}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <h3 className="text-lg font-semibold">{group.customerName}</h3>
-                    <Badge variant="secondary">
-                      {group.projects.length} {group.projects.length === 1 ? 'Projekt' : 'Projekte'}
-                    </Badge>
-                  </div>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Projektname</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Stunden</TableHead>
-                        <TableHead>Kosten</TableHead>
-                        <TableHead className="text-right">Aktionen</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {group.projects.map((project) => (
-                        <TableRow key={project.id}>
-                          <TableCell>{project.name}</TableCell>
-                          <TableCell>
-                            {getStatusBadge(project.status)}
-                          </TableCell>
-                          <TableCell>{project.total_hours.toFixed(2)}</TableCell>
-                          <TableCell>{'\u20AC'}{project.total_cost.toFixed(2)}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleViewTasks(project.id)}
-                                title="Aufgaben anzeigen"
-                              >
-                                <ClipboardList className="size-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleOpenDialog('edit', project)}
-                                title="Projekt bearbeiten"
-                              >
-                                <Pencil className="size-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleDeleteProject(project.id)}
-                                title="Projekt löschen"
-                                className="text-destructive hover:text-destructive"
-                              >
-                                <Trash2 className="size-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
+            <Accordion
+              type="multiple"
+              defaultValue={[]}
+            >
+              {groupedProjects.map((group) => (
+                <AccordionItem key={group.customerId} value={group.customerId}>
+                  <AccordionTrigger className="hover:no-underline py-3">
+                    <div className="flex items-center gap-3">
+                      <Building2 className="size-4 text-muted-foreground" />
+                      <span className="text-base font-semibold">{group.customerName}</span>
+                      <Badge variant="secondary">
+                        {group.projects.length} {group.projects.length === 1 ? 'Projekt' : 'Projekte'}
+                      </Badge>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-2">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Projektname</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Stunden</TableHead>
+                          <TableHead>Kosten</TableHead>
+                          <TableHead className="text-right">Aktionen</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  {groupIndex < groupedProjects.length - 1 && (
-                    <Separator className="mt-4" />
-                  )}
-                </div>
+                      </TableHeader>
+                      <TableBody>
+                        {group.projects.map((project) => (
+                          <TableRow key={project.id}>
+                            <TableCell>{project.name}</TableCell>
+                            <TableCell>
+                              {getStatusBadge(project.status)}
+                            </TableCell>
+                            <TableCell>{project.total_hours.toFixed(2)}</TableCell>
+                            <TableCell>{'\u20AC'}{project.total_cost.toFixed(2)}</TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex items-center justify-end gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleViewTasks(project.id)}
+                                  title="Aufgaben anzeigen"
+                                >
+                                  <ClipboardList className="size-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleOpenDialog('edit', project)}
+                                  title="Projekt bearbeiten"
+                                >
+                                  <Pencil className="size-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleDeleteProject(project.id)}
+                                  title="Projekt löschen"
+                                  className="text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="size-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </AccordionContent>
+                </AccordionItem>
               ))}
-            </div>
+            </Accordion>
           ) : (
             <p className="text-center py-8 text-muted-foreground">
               {searchQuery || selectedCustomerId !== 'all'
