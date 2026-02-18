@@ -968,8 +968,8 @@ const TasksPage: React.FC = () => {
                   <TableBody>
                     {filteredTasks.map((task) => (
                       <TableRow key={task.id}>
-                        <TableCell>{task.name}</TableCell>
-                        <TableCell>{task.description}</TableCell>
+                        <TableCell className="break-words whitespace-pre-wrap">{task.name}</TableCell>
+                        <TableCell className="break-words whitespace-pre-wrap">{task.description}</TableCell>
                         <TableCell>{task.total_hours.toFixed(2)}</TableCell>
                         <TableCell>&euro;{task.total_cost.toFixed(2)}</TableCell>
                         <TableCell>
