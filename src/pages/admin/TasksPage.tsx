@@ -1103,7 +1103,7 @@ const TasksPage: React.FC = () => {
                           {format(new Date(entry.start_time), 'dd.MM.yyyy HH:mm')}
                         </TableCell>
                         <TableCell className="font-medium">{entry.hours.toFixed(2)}h</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{entry.notes}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground break-words whitespace-pre-wrap">{entry.notes}</TableCell>
                         <TableCell>
                           <Badge variant={entry.manual_entry ? 'outline' : 'secondary'} className="text-xs">
                             {entry.manual_entry ? 'Manuell' : 'Timer'}
@@ -1408,7 +1408,7 @@ const TasksPage: React.FC = () => {
                           {format(new Date(entry.start_time), 'dd.MM.yyyy HH:mm')}
                         </TableCell>
                         <TableCell className="font-medium">{entry.hours.toFixed(2)}h</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{entry.notes}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground break-words whitespace-pre-wrap">{entry.notes}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
                             <Button
